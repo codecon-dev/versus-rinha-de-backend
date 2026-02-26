@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+*.log
+results/*.json
+results/*.html
+tmp/
+.DS_Store
+__pycache__/
+*.pyc
+vendor/

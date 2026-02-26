@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+
+gem "sinatra", "~> 4.1"
+gem "puma", "~> 6.5"
+gem "pg", "~> 1.5"
+gem "sequel", "~> 5.87"
+gem "rackup", "~> 2.2"

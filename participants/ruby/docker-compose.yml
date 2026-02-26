@@ -1,0 +1,35 @@
+services:
+  api:
+    build: .
+    ports:
+      - "${APP_PORT:-3004}:3000"
+    environment:
+      - PORT=3000
+      - DATABASE_URL=postgres://rinha:rinha@db:5432/rinha?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: "3GB"
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=rinha
+      - POSTGRES_PASSWORD=rinha
+      - POSTGRES_DB=rinha
+    volumes:
+      - ../../init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U rinha"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: "1GB"

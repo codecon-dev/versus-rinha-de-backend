@@ -1,0 +1,13 @@
+{
+  "name": "rinha-nodejs",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types src/server.ts",
+    "dev": "node --watch --experimental-strip-types src/server.ts"
+  },
+  "dependencies": {
+    "fastify": "^5.2.1",
+    "postgres": "^3.4.5"
+  }
+}
