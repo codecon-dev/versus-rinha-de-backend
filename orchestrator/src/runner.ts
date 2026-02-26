@@ -85,6 +85,10 @@ export function runLoadTests(p: Participant): LoadResult | null {
         timeout: 120_000,
       }
     );
+  } catch {
+    // k6 exits non-zero when thresholds are crossed, that's expected
+  }
+  try {
     if (existsSync(throughputOutput)) {
       const raw = JSON.parse(readFileSync(throughputOutput, "utf-8"));
       throughput = {
@@ -95,7 +99,7 @@ export function runLoadTests(p: Participant): LoadResult | null {
       };
     }
   } catch (e) {
-    console.error(`  Throughput test failed for ${p.name}:`, e);
+    console.error(`  Failed to parse throughput results for ${p.name}:`, e);
   }
 
   // Latency test
@@ -110,6 +114,10 @@ export function runLoadTests(p: Participant): LoadResult | null {
         timeout: 120_000,
       }
     );
+  } catch {
+    // k6 exits non-zero when thresholds are crossed, that's expected
+  }
+  try {
     if (existsSync(latencyOutput)) {
       const raw = JSON.parse(readFileSync(latencyOutput, "utf-8"));
       const p50 = raw.metrics?.http_req_duration?.values?.["p(50)"] ?? 0;
@@ -123,7 +131,7 @@ export function runLoadTests(p: Participant): LoadResult | null {
       };
     }
   } catch (e) {
-    console.error(`  Latency test failed for ${p.name}:`, e);
+    console.error(`  Failed to parse latency results for ${p.name}:`, e);
   }
 
   if (!throughput && !latency) return null;
