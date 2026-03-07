@@ -1,3 +1,7 @@
+networks:
+  app-network:
+    driver: bridge
+
 services:
   api:
     build: .
@@ -14,9 +18,11 @@ services:
         limits:
           cpus: "1.5"
           memory: "3GB"
+    networks:
+      - app-network
 
   db:
-    image: postgres:16-alpine
+    image: postgres:18-alpine
     environment:
       - POSTGRES_USER=rinha
       - POSTGRES_PASSWORD=rinha
@@ -33,3 +39,7 @@ services:
         limits:
           cpus: "0.5"
           memory: "1GB"
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
