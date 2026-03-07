@@ -33,7 +33,7 @@ export async function createUrl(
   } = { url: "https://example.com" },
 ): Promise<any> {
   const res = await api("/urls", { method: "POST", body: data });
-  if (res.status !== 201 && res.status !== 200) {
+  if (![200, 201].includes(res.status)) {
     const text = await res.text();
     throw new Error(`Create failed with ${res.status}: ${text}`);
   }
