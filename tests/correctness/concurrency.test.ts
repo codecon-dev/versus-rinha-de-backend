@@ -91,7 +91,7 @@ describe("Concurrency operations", () => {
     expect(codes.size).toBe(1);
   });
 
-  it.only("hash-uniqueness-50: 50 different URLs generate 50 unique codes", async () => {
+  it("hash-uniqueness-50: 50 different URLs generate 50 unique codes", async () => {
     const requests = Array.from({ length: 50 }, (_, i) =>
       api("/urls", {
         method: "POST",
@@ -102,9 +102,9 @@ describe("Concurrency operations", () => {
     const responses = await Promise.all(requests);
     const bodies = await Promise.all(responses.map((r) => r.json()));
 
-    // for (const res of responses) {
-    //   expect(res.status).toBe(201);
-    // }
+    for (const res of responses) {
+      expect(res.status).toBe(201);
+    }
 
     const codes = new Set(bodies.map((b) => b.code));
     expect(codes.size).toBe(50);

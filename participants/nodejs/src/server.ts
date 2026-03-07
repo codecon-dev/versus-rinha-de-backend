@@ -112,20 +112,20 @@ app.post("/urls", async (request, reply) => {
           };
         }
 
-        // if (url.custom_code) {
-        //   const existentCode = await tx.url.findFirst({
-        //     where: {
-        //       code: url.custom_code,
-        //     },
-        //   });
+        if (url.custom_code) {
+          const existentCode = await tx.url.findFirst({
+            where: {
+              code: url.custom_code,
+            },
+          });
 
-        //   // if (existentCode) {
-        //   //   return {
-        //   //     status: 409 as const,
-        //   //     data: { error: "Custom code already in use" },
-        //   //   };
-        //   // }
-        // }
+          if (existentCode) {
+            return {
+              status: 409 as const,
+              data: { error: "Custom code already in use" },
+            };
+          }
+        }
 
         const createdUrl = await tx.url.create({
           data: {
@@ -149,7 +149,9 @@ app.post("/urls", async (request, reply) => {
           },
         };
       },
-      { isolationLevel: Prisma.TransactionIsolationLevel.Serializable },
+      {
+        isolationLevel: Prisma.TransactionIsolationLevel.ReadCommitted,
+      },
     );
 
     return reply.status(result.status).send(result.data);
