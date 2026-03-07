@@ -137,4 +137,36 @@ describe("CRUD operations", () => {
     });
     expect(res.status).toBe(404);
   });
+
+  it("idempotent-create: POST /urls with same URL twice returns same code with 200", async () => {
+    const url = "https://example.com/idempotent-test";
+
+    const first = await api("/urls", { method: "POST", body: { url } });
+    expect(first.status).toBe(201);
+    const firstBody = await first.json();
+
+    const second = await api("/urls", { method: "POST", body: { url } });
+    expect(second.status).toBe(200);
+    const secondBody = await second.json();
+
+    expect(secondBody.code).toBe(firstBody.code);
+    expect(secondBody.id).toBe(firstBody.id);
+    expect(secondBody.url).toBe(firstBody.url);
+  });
+
+  it("idempotent-create-with-custom-code: POST same URL with custom_code on second call is ignored, returns existing", async () => {
+    const url = "https://example.com/idempotent-custom";
+    const customCode = randomCode(8);
+
+    const first = await createUrl({ url });
+
+    const second = await api("/urls", {
+      method: "POST",
+      body: { url, custom_code: customCode },
+    });
+    expect(second.status).toBe(200);
+    const secondBody = await second.json();
+
+    expect(secondBody.code).toBe(first.code);
+  });
 });

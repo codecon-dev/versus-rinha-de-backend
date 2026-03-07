@@ -41,36 +41,47 @@ export default function (data) {
 
   const rand = Math.random();
 
-  if (rand < 0.7) {
-    // 70% redirect
+  if (rand < 0.55) {
+    // 55% redirect (high volume to test caching)
     const url = urls[Math.floor(Math.random() * urls.length)];
     const res = http.get(`${BASE_URL}/${url.code}`, { redirects: 0 });
     check(res, {
       "redirect status 301": (r) => r.status === 301,
     });
-  } else if (rand < 0.85) {
-    // 15% create
+  } else if (rand < 0.70) {
+    // 15% create (mix of new and duplicate URLs to test idempotency)
+    const isRepeat = Math.random() < 0.3;
+    const targetUrl = isRepeat
+      ? `https://example.com/page/${Math.floor(Math.random() * 100)}`
+      : `https://example.com/load/${randomString(8)}`;
     const res = http.post(
       `${BASE_URL}/urls`,
-      JSON.stringify({ url: `https://example.com/load/${randomString(8)}` }),
+      JSON.stringify({ url: targetUrl }),
       { headers: { "Content-Type": "application/json" } }
     );
     check(res, {
-      "create status 201": (r) => r.status === 201,
+      "create status ok": (r) => r.status === 201 || r.status === 200,
     });
-  } else if (rand < 0.95) {
+  } else if (rand < 0.80) {
     // 10% get details
     const url = urls[Math.floor(Math.random() * urls.length)];
     const res = http.get(`${BASE_URL}/urls/${url.id}`);
     check(res, {
       "get status 200": (r) => r.status === 200,
     });
-  } else {
-    // 5% stats
+  } else if (rand < 0.90) {
+    // 10% stats
     const url = urls[Math.floor(Math.random() * urls.length)];
     const res = http.get(`${BASE_URL}/urls/${url.id}/stats`);
     check(res, {
       "stats status 200": (r) => r.status === 200,
+    });
+  } else {
+    // 10% QR code
+    const url = urls[Math.floor(Math.random() * urls.length)];
+    const res = http.get(`${BASE_URL}/urls/${url.id}/qr`);
+    check(res, {
+      "qr status 200": (r) => r.status === 200,
     });
   }
 }

@@ -10,6 +10,8 @@ CREATE TABLE urls (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX idx_urls_url ON urls(url);
+
 CREATE TABLE clicks (
     id BIGSERIAL PRIMARY KEY,
     url_id UUID NOT NULL REFERENCES urls(id) ON DELETE CASCADE,

@@ -6,7 +6,7 @@ describe("Stats operations", () => {
     await cleanup();
   });
 
-  it("stats-with-clicks: GET /urls/:id/stats returns click_count and clicks_per_day after clicks", async () => {
+  it("stats-with-clicks: GET /urls/:id/stats returns click_count, clicks_per_day and clicks_per_hour after clicks", async () => {
     const created = await createUrl({ url: "https://example.com/stats" });
 
     // Perform 5 clicks
@@ -32,9 +32,29 @@ describe("Stats operations", () => {
     );
     expect(todayEntry).toBeDefined();
     expect(todayEntry.count).toBe(5);
+
+    // clicks_per_hour should also be present
+    expect(body.clicks_per_hour).toBeDefined();
+    expect(Array.isArray(body.clicks_per_hour)).toBe(true);
+    expect(body.clicks_per_hour.length).toBeGreaterThanOrEqual(1);
+
+    // Current hour should have the 5 clicks
+    const totalHourClicks = body.clicks_per_hour.reduce(
+      (sum: number, entry: { hour: string; count: number }) => sum + entry.count,
+      0
+    );
+    expect(totalHourClicks).toBe(5);
+
+    // Each entry should have hour (ISO string) and count
+    for (const entry of body.clicks_per_hour) {
+      expect(entry).toHaveProperty("hour");
+      expect(entry).toHaveProperty("count");
+      expect(typeof entry.hour).toBe("string");
+      expect(typeof entry.count).toBe("number");
+    }
   });
 
-  it("stats-no-clicks: GET /urls/:id/stats returns click_count=0 with no clicks", async () => {
+  it("stats-no-clicks: GET /urls/:id/stats returns click_count=0 with empty arrays", async () => {
     const created = await createUrl({ url: "https://example.com/no-clicks" });
 
     const res = await api(`/urls/${created.id}/stats`);
@@ -46,6 +66,9 @@ describe("Stats operations", () => {
     expect(body.clicks_per_day).toBeDefined();
     expect(Array.isArray(body.clicks_per_day)).toBe(true);
     expect(body.clicks_per_day).toHaveLength(0);
+    expect(body.clicks_per_hour).toBeDefined();
+    expect(Array.isArray(body.clicks_per_hour)).toBe(true);
+    expect(body.clicks_per_hour).toHaveLength(0);
   });
 
   it("stats-not-found: GET /urls/:id/stats with unknown ID returns 404", async () => {
