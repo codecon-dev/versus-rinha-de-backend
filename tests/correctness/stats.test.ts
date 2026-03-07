@@ -28,7 +28,7 @@ describe("Stats operations", () => {
     // Today's date should appear in clicks_per_day
     const today = new Date().toISOString().split("T")[0];
     const todayEntry = body.clicks_per_day.find(
-      (entry: { date: string; count: number }) => entry.date === today
+      (entry: { date: string; count: number }) => entry.date === today,
     );
     expect(todayEntry).toBeDefined();
     expect(todayEntry.count).toBe(5);
@@ -40,8 +40,9 @@ describe("Stats operations", () => {
 
     // Current hour should have the 5 clicks
     const totalHourClicks = body.clicks_per_hour.reduce(
-      (sum: number, entry: { hour: string; count: number }) => sum + entry.count,
-      0
+      (sum: number, entry: { hour: string; count: number }) =>
+        sum + entry.count,
+      0,
     );
     expect(totalHourClicks).toBe(5);
 

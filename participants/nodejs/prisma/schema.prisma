@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Url {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code       String?    @unique @db.VarChar(16)
+  url        String    @unique
+  expiresAt  DateTime? @map("expires_at") @db.Timestamptz()
+  clickCount BigInt    @default(0) @map("click_count")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt  DateTime  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz()
+  clicks     Click[]
+
+  @@index([url], map: "idx_urls_url")
+  @@index([code], map: "idx_urls_code")
+  @@index([createdAt(sort: Desc)], map: "idx_urls_created_at")
+  @@map("urls")
+}
+
+model Click {
+  id        BigInt   @id @default(autoincrement())
+  urlId     String   @map("url_id") @db.Uuid
+  clickedAt DateTime @default(now()) @map("clicked_at") @db.Timestamptz()
+  url       Url      @relation(fields: [urlId], references: [id], onDelete: Cascade)
+
+  @@index([urlId], map: "idx_clicks_url_id")
+  @@index([clickedAt], map: "idx_clicks_clicked_at")
+  @@map("clicks")
+}

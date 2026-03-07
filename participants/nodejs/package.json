@@ -3,11 +3,23 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "start": "node --experimental-strip-types src/server.ts",
-    "dev": "node --watch --experimental-strip-types src/server.ts"
+    "start": "tsx src/server.ts",
+    "dev": "tsx watch src/server.ts"
   },
   "dependencies": {
+    "@prisma/adapter-pg": "^7.4.2",
+    "@prisma/client": "^7.4.2",
+    "dotenv": "^17.3.1",
     "fastify": "^5.2.1",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "qrcode": "^1.5.4",
+    "uuid": "^13.0.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "@types/qrcode": "^1.5.6",
+    "prisma": "^7.4.2",
+    "tsx": "^4.19.0"
   }
 }

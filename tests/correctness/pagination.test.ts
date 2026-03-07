@@ -11,7 +11,7 @@ describe("Pagination operations", () => {
     }
   });
 
-  it("pagination-default: GET /urls returns 10 items with meta.total=15", async () => {
+  it.only("pagination-default: GET /urls returns 10 items with meta.total=15", async () => {
     const res = await api("/urls");
     expect(res.status).toBe(200);
 

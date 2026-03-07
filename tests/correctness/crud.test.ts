@@ -1,5 +1,12 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import { api, createUrl, cleanup, futureDate, pastDate, randomCode } from "./helpers.ts";
+import {
+  api,
+  createUrl,
+  cleanup,
+  futureDate,
+  pastDate,
+  randomCode,
+} from "./helpers.ts";
 
 describe("CRUD operations", () => {
   beforeEach(async () => {
@@ -26,7 +33,10 @@ describe("CRUD operations", () => {
 
   it("create-with-custom-code: POST /urls with custom_code sets the code", async () => {
     const code = randomCode(8);
-    const body = await createUrl({ url: "https://example.com", custom_code: code });
+    const body = await createUrl({
+      url: "https://example.com",
+      custom_code: code,
+    });
 
     expect(body.code).toBe(code);
     expect(body.short_url).toContain(code);
@@ -34,7 +44,10 @@ describe("CRUD operations", () => {
 
   it("create-with-expiration: POST /urls with expires_at in future sets expiration", async () => {
     const expiresAt = futureDate(48);
-    const body = await createUrl({ url: "https://example.com", expires_at: expiresAt });
+    const body = await createUrl({
+      url: "https://example.com",
+      expires_at: expiresAt,
+    });
 
     expect(body.expires_at).toBeDefined();
     expect(new Date(body.expires_at).getTime()).toBeGreaterThan(Date.now());
@@ -101,7 +114,7 @@ describe("CRUD operations", () => {
     const body = await res.json();
     expect(body.url).toBe("https://updated.example.com");
     expect(new Date(body.updated_at).getTime()).toBeGreaterThanOrEqual(
-      new Date(created.updated_at).getTime()
+      new Date(created.updated_at).getTime(),
     );
   });
 
