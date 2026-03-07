@@ -5,13 +5,10 @@ from model import UrlModel, ClickModel
 from sqlalchemy.orm import Session
 from utils import valid_url, generate_random_code, generate_qrcode_base64
 from datetime import datetime
-
-import qrcode
+import threading
 
 
 import logging
-
-import pytz
 
 
 
@@ -252,8 +249,15 @@ async def get_urls(
     }
 
 
+my_lock = threading.Lock()
+
+
 @app.get("/{code}")
 async def get_code(code: str, response: Response, db: Session = Depends(get_db)):
+    # with my_lock:
+    # lock_id = hash(code)
+    # db.execute(text("SELECT pg_advisory_xact_lock(:id)"), {"code": lock_id})
+
     urlmodel = db.query(UrlModel).filter_by(code=code).first()
 
     if urlmodel is None:
@@ -287,7 +291,7 @@ async def get_code(code: str, response: Response, db: Session = Depends(get_db))
 
 
 @app.get("/urls/{id}/stats")
-async def get_code(id: str, response: Response, db: Session = Depends(get_db)):
+async def get_code_stats(id: str, response: Response, db: Session = Depends(get_db)):
     urlmodel = db.query(UrlModel).filter_by(id=id).first()
 
     if urlmodel is None:
@@ -319,7 +323,7 @@ async def get_code(id: str, response: Response, db: Session = Depends(get_db)):
 
 
 @app.get("/urls/{id}/qr")
-async def get_code(id: str, response: Response, db: Session = Depends(get_db)):
+async def get_code_qr(id: str, response: Response, db: Session = Depends(get_db)):
     urlmodel = db.query(UrlModel).filter_by(id=id).first()
 
     if urlmodel is None:
