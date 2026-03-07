@@ -1,4 +1,9 @@
 fastapi==0.115.8
 uvicorn==0.34.0
-psycopg[binary]==3.2.6
-psycopg_pool==3.2.6
+sqlalchemy==2.0.48
+psycopg2-binary
+alembic
+greenlet==3.2.4
+pytz==2026.1
+qrcode==8.2
+Pillow==12.1.1
