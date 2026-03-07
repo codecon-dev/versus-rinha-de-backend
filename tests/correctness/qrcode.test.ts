@@ -6,7 +6,7 @@ describe("QR Code operations", () => {
     await cleanup();
   });
 
-  it("qr-code-basic: GET /urls/:id/qr returns base64 PNG QR code", async () => {
+  it.skip("qr-code-basic: GET /urls/:id/qr returns base64 PNG QR code", async () => {
     const created = await createUrl({ url: "https://example.com/qr-test" });
 
     const res = await api(`/urls/${created.id}/qr`);

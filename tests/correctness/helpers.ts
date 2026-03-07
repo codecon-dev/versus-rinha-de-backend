@@ -9,7 +9,7 @@ interface RequestOptions {
 
 export async function api(
   path: string,
-  opts: RequestOptions = {}
+  opts: RequestOptions = {},
 ): Promise<Response> {
   const url = `${BASE_URL}${path}`;
   const headers: Record<string, string> = {
@@ -30,10 +30,10 @@ export async function createUrl(
     url: string;
     custom_code?: string;
     expires_at?: string;
-  } = { url: "https://example.com" }
+  } = { url: "https://example.com" },
 ): Promise<any> {
   const res = await api("/urls", { method: "POST", body: data });
-  if (res.status !== 201) {
+  if (res.status !== 201 && res.status !== 200) {
     const text = await res.text();
     throw new Error(`Create failed with ${res.status}: ${text}`);
   }

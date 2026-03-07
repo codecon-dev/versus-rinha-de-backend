@@ -6,6 +6,8 @@ services:
     environment:
       - PORT=3000
       - DATABASE_URL=postgres://rinha:rinha@db:5432/rinha?sslmode=disable
+    volumes:
+      - ./src:/app/src
     depends_on:
       db:
         condition: service_healthy
@@ -23,6 +25,8 @@ services:
       - POSTGRES_DB=rinha
     volumes:
       - ../../init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U rinha"]
       interval: 2s
