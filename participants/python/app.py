@@ -259,36 +259,35 @@ my_lock = threading.Lock()
 
 @app.get("/{code}")
 async def get_code(code: str, response: Response, db: Session = Depends(get_db)):
-    # with my_lock:
+    with my_lock:
     # lock_id = hash(code)
     # db.execute(text("SELECT pg_advisory_xact_lock(:id)"), {"code": lock_id})
+        urlmodel = db.query(UrlModel).filter_by(code=code).first()
 
-    urlmodel = db.query(UrlModel).filter_by(code=code).first()
+        if urlmodel is None:
+            response.status_code = 404
+            return {"error": "not found"}
 
-    if urlmodel is None:
-        response.status_code = 404
-        return {"error": "not found"}
+        if urlmodel.expires_at is not None:
+            expires_at = str(urlmodel.expires_at)
+            agora = datetime.now().astimezone()
+            data_parseada = datetime.fromisoformat(expires_at).astimezone()
 
-    if urlmodel.expires_at is not None:
-        expires_at = str(urlmodel.expires_at)
-        agora = datetime.now().astimezone()
-        data_parseada = datetime.fromisoformat(expires_at).astimezone()
+            if data_parseada < agora:
+                response.status_code = 410
+                return {"error": "expired"}
 
-        if data_parseada < agora:
-            response.status_code = 410
-            return {"error": "expired"}
-
-    try:
-        urlmodel.click_count = int(urlmodel.click_count) + 1
-        clickmodel = ClickModel(
-            url_id=urlmodel.id,
-            clicked_at=datetime.now().astimezone(),
-        )
-        db.add(clickmodel)
-        db.commit()
-    except Exception as _:
-        response.status_code = 500
-        return {"error": "error incrementing counter"}
+        try:
+            urlmodel.click_count = int(urlmodel.click_count) + 1
+            clickmodel = ClickModel(
+                url_id=urlmodel.id,
+                clicked_at=datetime.now().astimezone(),
+            )
+            db.add(clickmodel)
+            db.commit()
+        except Exception as _:
+            response.status_code = 500
+            return {"error": "error incrementing counter"}
 
     response.status_code = 301
     response.headers["location"] = urlmodel.url
