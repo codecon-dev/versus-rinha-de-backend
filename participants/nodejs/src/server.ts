@@ -36,7 +36,7 @@ app.addContentTypeParser(
 );
 
 app.get("/health", async () => {
-  return { status: "okay" };
+  return { status: "ok" };
 });
 
 app.get("/urls", async (request, reply) => {

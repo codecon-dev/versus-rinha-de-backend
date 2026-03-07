@@ -39,7 +39,5 @@ services:
         limits:
           cpus: "0.5"
           memory: "1GB"
-    ports:
-      - "5432:5432"
     networks:
       - app-network

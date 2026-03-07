@@ -10,6 +10,7 @@ import (
 	"log"
 	"math/big"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -27,7 +28,10 @@ var (
 )
 
 func initDB(ctx context.Context) {
-	dbURL := "postgres://rinha:rinha@localhost:5432/rinha?sslmode=disable"
+	dbURL := os.Getenv("DATABASE_URL")
+	if dbURL == "" {
+		dbURL = "postgres://rinha:rinha@localhost:5432/rinha?sslmode=disable"
+	}
 
 	var err error
 	dbPool, err = pgxpool.New(ctx, dbURL)

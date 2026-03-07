@@ -25,6 +25,11 @@ logger = logging.getLogger(__name__)
 app = FastAPI()
 
 
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
+
+
 class Url(BaseModel):
     url: str | None = None
     custom_code: str | None = None
@@ -331,9 +336,3 @@ async def get_code_qr(id: str, response: Response, db: Session = Depends(get_db)
         return {"error": "not found"}
 
     return {"qr_code": generate_qrcode_base64(urlmodel.url)}
-
-
-
-@app.get("/health")
-async def health():
-    return {"status": "ok"}

@@ -41,4 +41,4 @@ echo ""
 echo "Iniciando orquestrador..."
 echo ""
 cd "$ROOT_DIR/orchestrator"
-node --experimental-strip-types src/index.ts
+node --experimental-strip-types src/index.ts "$@"
