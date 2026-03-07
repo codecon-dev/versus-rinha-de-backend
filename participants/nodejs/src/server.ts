@@ -156,6 +156,23 @@ app.post("/urls", async (request, reply) => {
 
     return reply.status(result.status).send(result.data);
   } catch (e) {
+    if (!url.custom_code) {
+      const existing = await prisma.url.findFirst({
+        where: { url: url.url },
+      });
+      if (existing) {
+        return reply.status(200).send({
+          id: existing.id,
+          code: existing.code,
+          url: existing.url,
+          short_url: `http://localhost:${port}/${existing.code}`,
+          expires_at: existing.expiresAt?.toISOString() ?? null,
+          click_count: Number(existing.clickCount),
+          created_at: existing.createdAt.toISOString(),
+          updated_at: existing.updatedAt.toISOString(),
+        });
+      }
+    }
     return reply.status(409).send({ error: "Custom code already in use" });
   }
 });
