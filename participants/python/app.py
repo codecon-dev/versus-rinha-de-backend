@@ -78,6 +78,8 @@ async def create_urls(url: Url, response: Response, db: Session = Depends(get_db
             code=custom_code,
             url=url.url,
             expires_at=url.expires_at,
+            created_at=datetime.now(),
+            updated_at=datetime.now(),
         )
 
         db.add(urlmodel)
@@ -93,8 +95,8 @@ async def create_urls(url: Url, response: Response, db: Session = Depends(get_db
             "expires_at": urlmodel.expires_at,
             "short_url": f"https://localhost:3000/{urlmodel.code}",
             "click_count": urlmodel.click_count,
-            "created_at": "2026-01-01",
-            "updated_at": "2026-01-01",
+            "created_at": urlmodel.created_at,
+            "updated_at": urlmodel.updated_at,
         }
 
         return return_json
@@ -146,9 +148,11 @@ async def patch_urls(id: str | None, url: Url, response: Response, db: Session =
     try:
         if url.url is not None:
             urlmodel.url = url.url
+            urlmodel.updated_at = datetime.now()
 
         if url.expires_at is not None:
             urlmodel.expires_at = str(url.expires_at)
+            urlmodel.updated_at = datetime.now()
 
         db.add(urlmodel)
         db.commit()
@@ -163,8 +167,8 @@ async def patch_urls(id: str | None, url: Url, response: Response, db: Session =
             "expires_at": urlmodel.expires_at,
             "short_url": f"https://localhost:3000/{urlmodel.code}",
             "click_count": urlmodel.click_count,
-            "created_at": "2026-01-01",
-            "updated_at": "2026-01-01",
+            "created_at": urlmodel.created_at,
+            "updated_at": urlmodel.updated_at,
         }
 
         return return_json
@@ -212,23 +216,39 @@ async def get_url(id: str | None, response: Response, db: Session = Depends(get_
         "expires_at": urlmodel.expires_at,
         "short_url": f"https://localhost:3000/{urlmodel.code}",
         "click_count": urlmodel.click_count,
-        "created_at": "2026-01-01",
-        "updated_at": "2026-01-01",
+        "created_at": urlmodel.created_at,
+        "updated_at": urlmodel.updated_at,
     }
 
     return return_json
 
 
 @app.get("/urls")
-async def get_urls(request: Request, page: int = Query(1, ge=1), page_size: int = Query(10, ge=1, le=100), db: Session = Depends(get_db)):
-    skip = (page - 1) * page_size
+async def get_urls(
+    request: Request,
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    skip = (page - 1) * per_page
 
-    items = db.query(UrlModel).offset(skip).limit(page_size).all()
+    items = (
+        db.query(UrlModel)
+        .order_by(UrlModel.created_at.desc())
+        .offset(skip)
+        .limit(per_page)
+        .all()
+    )
+
     total_items = db.query(UrlModel).count()
 
     return {
         "data": items,
-        "meta": { "page": page, "per_page": page_size, "total": total_items }
+        "meta": {
+            "page": page,
+            "per_page": per_page,
+            "total": total_items,
+        },
     }
 
 

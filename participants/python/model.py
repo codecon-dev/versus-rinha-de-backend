@@ -18,13 +18,8 @@ class UrlModel(Base):
     url: Mapped[Optional[str]]
     expires_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
     click_count: Mapped[int] = mapped_column(default=0)
-    # created_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
-    # created_at: Mapped[datetime] = mapped_column(
-    #     DateTime(timezone=True),
-    #     server_default=func.now(),
-    #     nullable=False,
-    # )
-    # updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
 
 
 class ClickModel(Base):
