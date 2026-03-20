@@ -44,7 +44,7 @@ export async function waitForHealth(
   p: Participant,
   timeoutMs = 30_000
 ): Promise<boolean> {
-  const url = `http://localhost:${p.port}/health`;
+  const url = `http://host.docker.internal:${p.port}/health`;
   const start = Date.now();
 
   while (Date.now() - start < timeoutMs) {
