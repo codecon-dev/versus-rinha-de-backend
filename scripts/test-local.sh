@@ -43,7 +43,7 @@ echo ""
 echo "3. Aguardando health check..."
 HEALTHY=false
 for i in $(seq 1 30); do
-  if curl -s "http://localhost:$PORT/health" 2>/dev/null | grep -q '"ok"'; then
+  if curl -s "http://host.docker.internal:$PORT/health" 2>/dev/null | grep -q '"ok"'; then
     HEALTHY=true
     break
   fi
@@ -72,7 +72,7 @@ echo ""
 echo "4. Rodando testes de corretude..."
 echo ""
 cd "$ROOT_DIR/tests/correctness"
-API_URL="http://localhost:$PORT" npx vitest run --reporter=verbose 2>&1 || true
+API_URL="http://host.docker.internal:$PORT" npx vitest run --reporter=verbose 2>&1 || true
 
 # Cleanup
 echo ""

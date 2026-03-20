@@ -30,7 +30,7 @@ var (
 func initDB(ctx context.Context) {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://rinha:rinha@localhost:5432/rinha?sslmode=disable"
+		dbURL = "postgres://rinha:rinha@host.docker.internal:5432/rinha?sslmode=disable"
 	}
 
 	var err error
@@ -154,7 +154,7 @@ func scanUrl(s Scanner) (Url, error) {
 		exp := expiresAt.UTC().Format(time.RFC3339Nano)
 		u.ExpiresAt = &exp
 	}
-	u.ShortURL = fmt.Sprintf("http://localhost:3000/%s", u.Code)
+	u.ShortURL = fmt.Sprintf("http://host.docker.internal:3000/%s", u.Code)
 	return u, nil
 }
 

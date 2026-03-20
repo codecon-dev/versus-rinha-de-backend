@@ -212,8 +212,8 @@ class UrlController < ApplicationController
     return false if str.blank?
     uri = URI.parse(str)
     return false unless (uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)) && uri.host.present?
-    # Reject bare hostnames like "not-a-url" (no dot, not localhost)
-    return false unless uri.host.include?(".") || uri.host == "localhost"
+    # Reject bare hostnames like "not-a-url" (no dot, not host.docker.internal)
+    return false unless uri.host.include?(".") || uri.host == "host.docker.internal"
     true
   rescue URI::InvalidURIError
     false

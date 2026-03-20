@@ -227,3 +227,22 @@ Isso vai:
 1. Descobrir todos os participantes em `participants/`
 2. Para cada um: build → start → health check → testes de corretude → testes de carga → stop
 3. Calcular scores e gerar ranking em `results/results.json`
+
+## Rodar o Pipeline Completo com DevContainer (Recomendado)
+
+Se você utiliza o VsCode com a extensão **Dev Containers**, pode executar todo o pipeline dentro de um ambiente isolado e pré-configurado, sem precisar instalar Node.js, k6 ou configurar variáveis de ambiente manualmente.
+
+### Pré-requisitos
+- [Docker](https://docs.docker.com/get-docker/) instalado e em execução.
+- [VsCode](https://code.visualstudio.com/) com a extensão **Dev Containers** (ms-vscode-remote.remote-containers).
+
+### Passos
+1. **Abra o projeto no DevContainer**  
+   - No VsCode, pressione `Ctrl+Shift+P` e selecione o comando **`Dev Containers: Reopen in Container`** ou **`Dev Containers: Rebuild containers`**.  
+   - O container será construído automaticamente com base no arquivo `.devcontainer/devcontainer.json`, contendo todas as dependências necessárias.  
+   - Após a construção, só rodar e ser feliz.
+
+2. **Execute o pipeline**  
+   No terminal do container, rode o script principal:
+   ```bash
+   ./scripts/run.sh

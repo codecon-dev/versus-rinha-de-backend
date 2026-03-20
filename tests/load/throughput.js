@@ -3,7 +3,7 @@ import { check, sleep } from "k6";
 import { SharedArray } from "k6/data";
 import { randomString } from "https://jslib.k6.io/k6-utils/1.4.0/index.js";
 
-const BASE_URL = __ENV.BASE_URL || "http://localhost:3000";
+const BASE_URL = __ENV.BASE_URL || "http://host.docker.internal:3000";
 const OUTPUT_FILE = __ENV.OUTPUT_FILE || "throughput-results.json";
 
 export const options = {

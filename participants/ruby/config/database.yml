@@ -22,7 +22,7 @@ default: &default
 development:
   <<: *default
   database: gelyurl_development
-  host: localhost
+  host: host.docker.internal
   username: postgres
   password: postgres
   # To create additional roles in PostgreSQL see `$ createuser --help`.
@@ -36,7 +36,7 @@ development:
   # Connect on a TCP socket. Omitted by default since the client uses a
   # domain socket that doesn't need configuration. Windows does not have
   # domain sockets, so uncomment these lines.
-  #host: localhost
+  #host: host.docker.internal
 
   # The TCP port the server listens on. Defaults to 5432.
   # If your server runs on a different port number, change accordingly.
@@ -57,7 +57,7 @@ development:
 test:
   <<: *default
   database: gelyurl_test
-  host: localhost
+  host: host.docker.internal
   username: postgres
   password: postgres
 
@@ -68,7 +68,7 @@ test:
 # Instead, provide the password or a full connection URL as an environment
 # variable when you boot the app. For example:
 #
-#   DATABASE_URL="postgres://myuser:mypass@localhost/somedatabase"
+#   DATABASE_URL="postgres://myuser:mypass@host.docker.internal/somedatabase"
 #
 # If the connection URL is provided in the special DATABASE_URL environment
 # variable, Rails will automatically merge its configuration values on top of
