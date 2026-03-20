@@ -1,0 +1,19 @@
+{
+	"name": "versus-rinha-backend",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:4-22-bullseye",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
+		"ghcr.io/devcontainers/features/git:1": {},
+		"ghcr.io/devcontainers-extra/features/k6:1": {}
+	},
+    "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+	"remoteEnv": {
+        "HOST_PROJECT_PATH": "${localWorkspaceFolder}"
+    },
+	"portsAttributes": {
+		"6565": {
+			"label": "K6 API",
+			"onAutoForward": "notify"
+		}
+	}
+}
