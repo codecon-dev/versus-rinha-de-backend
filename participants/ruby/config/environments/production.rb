@@ -41,7 +41,7 @@ Rails.application.configure do
   # Can be used together with config.force_ssl for Strict-Transport-Security and secure cookies.
   # config.assume_ssl = true
 
-  # Force all access to the app over SSL (disabled in Docker so http://localhost works).
+  # Force all access to the app over SSL (disabled in Docker so http://host.docker.internal works).
   config.force_ssl = ENV["DISABLE_FORCE_SSL"] != "1"
 
   # Log to STDOUT by default
