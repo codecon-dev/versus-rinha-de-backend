@@ -103,7 +103,7 @@ app.post("/urls", async (request, reply) => {
               id: existingUrl.id,
               code: existingUrl.code,
               url: existingUrl.url,
-              short_url: `http://localhost:${port}/${existingUrl.code}`,
+              short_url: `http://host.docker.internal:${port}/${existingUrl.code}`,
               expires_at: existingUrl.expiresAt?.toISOString() ?? null,
               click_count: Number(existingUrl.clickCount),
               created_at: existingUrl.createdAt.toISOString(),
@@ -141,7 +141,7 @@ app.post("/urls", async (request, reply) => {
             id: createdUrl.id,
             code: createdUrl.code,
             url: createdUrl.url,
-            short_url: `http://localhost:${port}/${createdUrl.code}`,
+            short_url: `http://host.docker.internal:${port}/${createdUrl.code}`,
             expires_at: createdUrl.expiresAt?.toISOString() ?? null,
             click_count: Number(createdUrl.clickCount),
             created_at: createdUrl.createdAt.toISOString(),
@@ -165,7 +165,7 @@ app.post("/urls", async (request, reply) => {
           id: existing.id,
           code: existing.code,
           url: existing.url,
-          short_url: `http://localhost:${port}/${existing.code}`,
+          short_url: `http://host.docker.internal:${port}/${existing.code}`,
           expires_at: existing.expiresAt?.toISOString() ?? null,
           click_count: Number(existing.clickCount),
           created_at: existing.createdAt.toISOString(),
@@ -186,7 +186,7 @@ app.get("/urls/:id", async (request, reply) => {
       id: url.id,
       code: url.code,
       url: url.url,
-      short_url: `http://localhost:${port}/${url.code}`,
+      short_url: `http://host.docker.internal:${port}/${url.code}`,
       expires_at: url.expiresAt?.toISOString() ?? null,
       click_count: Number(url.clickCount),
       created_at: url.createdAt.toISOString(),
@@ -229,7 +229,7 @@ app.patch("/urls/:id", async (request, reply) => {
     id: updatedUrl.id,
     code: updatedUrl.code,
     url: updatedUrl.url,
-    short_url: `http://localhost:${port}/${updatedUrl.code}`,
+    short_url: `http://host.docker.internal:${port}/${updatedUrl.code}`,
     expires_at: updatedUrl.expiresAt?.toISOString() ?? null,
     click_count: Number(updatedUrl.clickCount),
     created_at: updatedUrl.createdAt.toISOString(),
@@ -311,14 +311,14 @@ app.get("/urls/:id/stats", async (request, reply) => {
   return reply.status(200).send(data);
 });
 
-// Retorna o QR Code da `short_url` codificado em base64 (imagem PNG). O conteúdo do QR Code deve ser a `short_url` completa (ex: `http://localhost:3000/aB3kZ7`).
+// Retorna o QR Code da `short_url` codificado em base64 (imagem PNG). O conteúdo do QR Code deve ser a `short_url` completa (ex: `http://host.docker.internal:3000/aB3kZ7`).
 app.get("/urls/:id/qr", async (request, reply) => {
   const { id } = request.params as { id: string };
   const url = await prisma.url.findUnique({ where: { id } });
   if (!url) {
     return reply.status(404).send({ error: "URL not found" });
   }
-  const shortUrl = `http://localhost:${port}/${url.code}`;
+  const shortUrl = `http://host.docker.internal:${port}/${url.code}`;
   const data = { qr_code: await generateQrCode(shortUrl) };
 
   return reply.status(200).send(data);
