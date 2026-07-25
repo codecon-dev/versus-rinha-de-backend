@@ -9,7 +9,7 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Listen(IPAddress.Parse("172.16.82.248"), 3000);
+    serverOptions.Listen(IPAddress.Parse("localhost"), 3000);
 });
 
 builder.Services.AddSingleton(_ => Db.CreateDataSource());
