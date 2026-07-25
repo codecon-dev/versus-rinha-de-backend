@@ -1,4 +1,6 @@
-const BASE_URL = process.env.API_URL || "http://localhost:3000";
+const BASE_URL =
+  process.env.API_URL ||
+  `http://${process.env.APP_HOST ?? "localhost"}:3000`;
 
 /** Quanto tempo esperar o worker liquidar antes de desistir. */
 export const SETTLE_TIMEOUT_MS = 20_000;

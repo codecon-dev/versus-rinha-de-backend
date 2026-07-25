@@ -8,7 +8,8 @@
 	},
     "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"remoteEnv": {
-        "HOST_PROJECT_PATH": "${localWorkspaceFolder}"
+        "HOST_PROJECT_PATH": "${localWorkspaceFolder}",
+        "APP_HOST": "host.docker.internal"
     },
 	"portsAttributes": {
 		"6565": {

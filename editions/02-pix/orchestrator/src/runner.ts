@@ -11,6 +11,9 @@ import type {
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 
+// host.docker.internal dentro do DevContainer, localhost fora dele.
+const APP_HOST = process.env.APP_HOST ?? "localhost";
+
 export function runCorrectnessTests(
   p: Participant
 ): CorrectnessResult | null {
@@ -47,7 +50,7 @@ function runVitest(
         timeout: 300_000,
         env: {
           ...process.env,
-          API_URL: `http://localhost:${p.port}`,
+          API_URL: `http://${APP_HOST}:${p.port}`,
         },
       }
     );
@@ -97,7 +100,7 @@ export function runLoadTests(p: Participant, quiet = false): LoadResult | null {
   let throughput: ThroughputResult | null = null;
   try {
     execSync(
-      `k6 run --out json=/dev/null -e BASE_URL=http://localhost:${p.port} -e OUTPUT_FILE=${throughputOutput} throughput.js`,
+      `k6 run --out json=/dev/null -e BASE_URL=http://${APP_HOST}:${p.port} -e OUTPUT_FILE=${throughputOutput} throughput.js`,
       {
         cwd: loadDir,
         encoding: "utf-8",
@@ -126,7 +129,7 @@ export function runLoadTests(p: Participant, quiet = false): LoadResult | null {
   let latency: LatencyResult | null = null;
   try {
     execSync(
-      `k6 run --out json=/dev/null -e BASE_URL=http://localhost:${p.port} -e OUTPUT_FILE=${latencyOutput} latency.js`,
+      `k6 run --out json=/dev/null -e BASE_URL=http://${APP_HOST}:${p.port} -e OUTPUT_FILE=${latencyOutput} latency.js`,
       {
         cwd: loadDir,
         encoding: "utf-8",

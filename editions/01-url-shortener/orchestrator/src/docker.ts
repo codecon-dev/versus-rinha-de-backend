@@ -1,6 +1,10 @@
 import { execSync, type ExecSyncOptionsWithStringEncoding } from "node:child_process";
 import type { Participant } from "./types.ts";
 
+// Dentro do DevContainer a app publicada no host é alcançada por
+// host.docker.internal; fora dele, localhost. O devcontainer.json define APP_HOST.
+const APP_HOST = process.env.APP_HOST ?? "localhost";
+
 const execOpts: ExecSyncOptionsWithStringEncoding = {
   encoding: "utf-8",
   stdio: "pipe",
@@ -44,7 +48,7 @@ export async function waitForHealth(
   p: Participant,
   timeoutMs = 30_000
 ): Promise<boolean> {
-  const url = `http://host.docker.internal:${p.port}/health`;
+  const url = `http://${APP_HOST}:${p.port}/health`;
   const start = Date.now();
 
   while (Date.now() - start < timeoutMs) {

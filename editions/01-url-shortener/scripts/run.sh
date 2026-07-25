@@ -4,6 +4,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Dentro do DevContainer os bind mounts são resolvidos pelo Docker do host, então
+# o compose precisa do caminho da edição no host. Fora dele, HOST_PROJECT_PATH não
+# existe e o compose cai no caminho relativo (../..).
+if [ -n "${HOST_PROJECT_PATH:-}" ]; then
+  export EDITION_PATH="$HOST_PROJECT_PATH/editions/$(basename "$ROOT_DIR")"
+fi
+
 echo "=== Rinha de Backend - Encurtador de URL ==="
 echo ""
 

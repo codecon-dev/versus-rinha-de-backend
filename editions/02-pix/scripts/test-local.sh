@@ -8,6 +8,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 
+# Dentro do DevContainer os bind mounts são resolvidos pelo Docker do host, então
+# o compose precisa do caminho da edição no host. Fora dele, HOST_PROJECT_PATH não
+# existe e o compose cai no caminho relativo (../..).
+if [ -n "${HOST_PROJECT_PATH:-}" ]; then
+  export EDITION_PATH="$HOST_PROJECT_PATH/editions/$(basename "$ROOT_DIR")"
+fi
+
 PARTICIPANT=${1:?Uso: $0 <pasta-do-participante> [porta]}
 PORT=${2:-3001}
 PARTICIPANT_DIR="$ROOT_DIR/participants/$PARTICIPANT"
@@ -41,7 +48,7 @@ echo ""
 echo "3. Aguardando health check..."
 HEALTHY=false
 for i in $(seq 1 30); do
-  if curl -s "http://localhost:$PORT/health" 2>/dev/null | grep -q '"ok"'; then
+  if curl -s "http://${APP_HOST:-localhost}:$PORT/health" 2>/dev/null | grep -q '"ok"'; then
     HEALTHY=true
     break
   fi
@@ -70,7 +77,7 @@ echo ""
 echo "4. Rodando testes de corretude..."
 echo ""
 cd "$ROOT_DIR/tests/correctness"
-API_URL="http://localhost:$PORT" npx vitest run --reporter=verbose 2>&1 || true
+API_URL="http://${APP_HOST:-localhost}:$PORT" npx vitest run --reporter=verbose 2>&1 || true
 
 # Cleanup
 echo ""
