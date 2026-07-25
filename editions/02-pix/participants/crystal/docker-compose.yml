@@ -6,12 +6,16 @@ services:
   api:
     build: .
     ports:
-      - "${APP_PORT:-3001}:3000"
+      - "${APP_PORT:-3005}:3000"
     environment:
       - PORT=3000
-      - DATABASE_URL=postgres://rinha:rinha@db:5432/rinha?sslmode=disable
+      - DATABASE_URL=postgres://rinha:rinha@db:5432/rinha?sslmode=disable&max_pool_size=1
+      - BROKER_URL=amqp://guest:guest@lavinmq:5672/
+    #command: ["tail", "-f", "/dev/null"]
     depends_on:
       db:
+        condition: service_healthy
+      lavinmq:
         condition: service_healthy
     deploy:
       resources:
@@ -21,12 +25,38 @@ services:
     networks:
       - app-network
 
+  lavinmq:
+    image: cloudamqp/lavinmq:latest
+    container_name: lavinmq
+    healthcheck:
+      test: ["CMD", "lavinmqctl", "status"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+    # volumes:
+    #   - ./lavinmq.ini:/etc/lavinmq/lavinmq.ini:ro
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app-network
+  lavinmq:
+    image: redis
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
   db:
     image: postgres:18-alpine
     environment:
       - POSTGRES_USER=rinha
       - POSTGRES_PASSWORD=rinha
       - POSTGRES_DB=rinha
+    ports:
+      - "5432:5432"
     volumes:
       - ${EDITION_PATH:-../..}/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
