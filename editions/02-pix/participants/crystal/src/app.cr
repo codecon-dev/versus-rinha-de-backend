@@ -15,16 +15,6 @@ MUTEX = Sync::RWLock.new
 ENTRIES = Array(Transfers).new
 LAST_INDEX = 0
 
-workers_ctx.spawn do
-    loop do
-      MUTEX.write do
-        DB_CONNECTION.exec("SELECT ")
-      end
-      sleep 125.milliseconds
-    end
-end
-
-
 DB_CONNECTION.exec("
   CREATE UNLOGGED TABLE IF NOT EXISTS temp_transfers (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -39,27 +29,55 @@ DB_CONNECTION.exec("
   );
   ")
 
-# DB_CONNECTION.exec("
-#   CREATE MATERIALIZED VIEW computed_transfers AS
-#   SELECT
-#     id,
-#     payer_id,
-#     payee_id,
-#     amount,
-#     (SELECT SUM(tmp.amount) FROM temp_transfers tmp WHERE tmp.payer_id = payer_id OR tmp.payee_id = payee_id AND tmp.created_at <= created_at)  as balance_until_now,
-#     idempotency_key,
-#     CASE
-#       WHEN balance_until_now >= amount THEN 'completed'
-#       WHEN balance_until_now < amount THEN 'failed'
-#     END AS status,
-#     CASE
-#       WHEN status = 'failed' THEN 'insufficient_funds'
-#     ELSE NULL
-#     END AS failure_reason,
-#     created_at,
-#     NOW() as processed_at
-#   FROM temp_transfers
-# ")
+workers_ctx.spawn do
+    loop do
+      MUTEX.write do
+        DB_CONNECTION.transaction do |tx|
+          conn = tx.connection
+          conn.exec("
+            WITH picked AS (
+              SELECT id, payer_id, payee_id, amount
+              FROM temp_transfers
+              WHERE status = 'pending'
+              ORDER BY created_at, id
+              LIMIT 1
+              FOR UPDATE SKIP LOCKED
+            ),
+            debited AS (
+              UPDATE accounts a
+              SET balance = balance - picked.amount, updated_at = NOW()
+              FROM picked
+              WHERE a.id = picked.payer_id
+                AND a.balance >= picked.amount
+              RETURNING picked.id, picked.payee_id, picked.amount
+            ),
+            credited AS (
+              UPDATE accounts a
+              SET balance = balance + debited.amount, updated_at = NOW()
+              FROM debited
+              WHERE a.id = debited.payee_id
+              RETURNING debited.id
+            )
+            UPDATE temp_transfers t
+            SET
+              status = CASE
+                WHEN credited.id IS NOT NULL THEN 'completed'
+                ELSE 'failed'
+              END,
+              failure_reason = CASE
+                WHEN credited.id IS NULL THEN 'insufficient_funds'
+                ELSE NULL
+              END,
+              processed_at = NOW()
+            FROM picked
+            LEFT JOIN credited ON credited.id = picked.id
+            WHERE t.id = picked.id
+          ")
+        end
+      end
+      sleep 5.milliseconds
+    end
+end
 
 class Accounts
   include DB::Serializable
@@ -73,6 +91,7 @@ class Accounts
   @[DB::Field(ignore: true)]
   property accountId : String?
 end
+@[JSON::Serializable::Options(emit_nulls: true)]
 class Transfers
   include DB::Serializable
   include JSON::Serializable
@@ -84,12 +103,15 @@ class Transfers
   @[JSON::Field(key: "idempotencyKey")]
   property idempotency_key : String
   property amount : Int64
+  @[JSON::Field(key: "createdAt")]
   property created_at : Time?
   property processed_at : Time?
   property status : String?
   @[JSON::Field(key: "failureReason")]
   property failure_reason : String?
+  property xmax : Bool?
 end
+
 get "/health" do |env|
   DB_CONNECTION.scalar("SELECT 1").as(Int32)
   env.json({ status: "ok" })
@@ -113,6 +135,7 @@ post "/accounts" do |env|
     end
     DB_CONNECTION.exec("INSERT INTO accounts(id, balance) VALUES($1, $2)", acct.id, acct.balance)
     env.response.status_code = 201
+    env.json(acct)
   rescue e: PQ::PQError
     if e.message.to_s.not_nil!.includes?("duplicate key")
       env.response.status_code = 409
@@ -126,22 +149,30 @@ end
 
 post "/transfers" do |env|
   begin
-    # BloomFilter
     t = Transfers.from_json(env.request.body.not_nil!)
+    if t.amount <= 0
+      env.response.status_code = 422
+      next
+    end
+    if t.payer_id == t.payee_id
+      env.response.status_code = 422
+      next
+    end
     time = Time.utc
     id = UUID.random
-    DB_CONNECTION.exec("INSERT INTO temp_transfers(id, payer_id, payee_id, amount, idempotency_key, created_at) VALUES($1, $2, $3, $4, $5, $6)", id, t.payer_id, t.payee_id, t.amount, t.idempotency_key, time)
-    # AMQPClient.publish(env.request.body.not_nil!)
+    tt = Transfers.from_rs(DB_CONNECTION.query("INSERT INTO temp_transfers(id, payer_id, payee_id, amount, idempotency_key, created_at) VALUES($1, $2, $3, $4, $5, $6) ON CONFLICT(idempotency_key) DO UPDATE SET id = temp_transfers.id RETURNING *, (xmax=0) AS xmax", id, t.payer_id, t.payee_id, t.amount, t.idempotency_key, time)).first?.not_nil!
     t.created_at = time
     t.status = "pending"
-    t.id = id
     t.failure_reason = nil
-    # MUTEX.write do
-    #   ENTRIES << t
-    # end
-    # AMQPClient.publish(IO::Memory.new(t.to_json))
-    env.response.status_code = 201
-    env.json(t)
+    env.response.status_code = tt.xmax == 0 ? 200 : 201
+    env.json(tt)
+  rescue e: PQ::PQError
+    puts e.message.to_s
+    if e.message.to_s.not_nil!.includes?("violates")
+      env.response.status_code = 422
+      next
+    end
+    env.response.status_code = 500
   rescue e : JSON::SerializableError
     env.response.status_code = 422
   end
@@ -165,7 +196,7 @@ get "/accounts/:id/statement" do |env|
     next
   end
   env.response.status_code = 200
-  transfers = Transfers.from_rs(DB_CONNECTION.query("SELECT * FROM temp_transfers WHERE payer_id = $1 OR payee_id = $1", id))
+  transfers = Transfers.from_rs(DB_CONNECTION.query("SELECT * FROM temp_transfers WHERE (payer_id = $1 OR payee_id = $1) AND status = 'completed'  ORDER BY created_at DESC", id))
   acct.transfers = transfers
   acct.accountId = id
   env.json(acct)
