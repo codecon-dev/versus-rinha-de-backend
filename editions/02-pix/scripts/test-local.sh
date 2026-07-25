@@ -37,11 +37,11 @@ echo ""
 # Build and start
 echo "1. Construindo imagem Docker..."
 cd "$PARTICIPANT_DIR"
-docker compose -p "rinha-$PARTICIPANT" build
+docker-compose -p "rinha-$PARTICIPANT" build
 
 echo ""
 echo "2. Subindo containers..."
-APP_PORT=$PORT docker compose -p "rinha-$PARTICIPANT" up -d
+APP_PORT=$PORT docker-compose -p "rinha-$PARTICIPANT" up -d
 
 # Wait for health
 echo ""
@@ -58,8 +58,8 @@ done
 if [ "$HEALTHY" = false ]; then
   echo "ERRO: Health check falhou após 30 segundos."
   echo "Logs do container:"
-  docker compose -p "rinha-$PARTICIPANT" logs api
-  docker compose -p "rinha-$PARTICIPANT" down -v
+  docker-compose -p "rinha-$PARTICIPANT" logs api
+  docker-compose -p "rinha-$PARTICIPANT" down -v
   exit 1
 fi
 
@@ -83,7 +83,7 @@ API_URL="http://${APP_HOST:-localhost}:$PORT" npx vitest run --reporter=verbose 
 echo ""
 echo "5. Parando containers..."
 cd "$PARTICIPANT_DIR"
-docker compose -p "rinha-$PARTICIPANT" down -v
+docker-compose -p "rinha-$PARTICIPANT" down -v
 
 echo ""
 echo "=== Fim ==="

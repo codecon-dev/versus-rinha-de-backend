@@ -1,0 +1,8 @@
+{
+  "devDependencies": {
+    "@types/node": "^26.1.1"
+  },
+  "dependencies": {
+    "class-validator": "^0.15.1"
+  }
+}
