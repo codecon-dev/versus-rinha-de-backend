@@ -1,0 +1,12 @@
+{
+  "name": "rinha-pix",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "node src/server.ts",
+    "dev": "node --watch src/server.ts"
+  },
+  "comment": "Adicione suas dependências com `npm install <pacote>`.",
+  "dependencies": {}
+}

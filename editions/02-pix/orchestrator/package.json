@@ -1,0 +1,12 @@
+{
+  "name": "rinha-orchestrator",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --experimental-strip-types src/index.ts",
+    "dev": "node --watch --experimental-strip-types src/index.ts"
+  },
+  "dependencies": {
+    "chalk": "^5.4.1"
+  }
+}

@@ -1,0 +1,11 @@
+name: app
+version: 0.1.0
+
+targets:
+  app:
+    main: src/app.cr
+
+# Adicione suas dependências aqui (ex: pg, kemal, ...) e rode `shards install`.
+dependencies: {}
+
+crystal: ">= 1.0.0"
