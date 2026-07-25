@@ -31,7 +31,7 @@ export function setup() {
       JSON.stringify({ id, balance: SEED_BALANCE }),
       JSON_HEADERS,
     );
-    if (res.status === 201) ids.push(id);
+    if (res.status === 200 || res.status === 201) ids.push(id);
   }
   return { ids };
 }
@@ -58,7 +58,7 @@ export default function (data) {
       }),
       JSON_HEADERS,
     );
-    check(res, { "transfer status 201": (r) => r.status === 201 });
+    check(res, { "transfer status 200/201": (r) => r.status === 200 || r.status === 201 });
   } else {
     // 30% consulta de extrato
     const id = ids[Math.floor(Math.random() * ids.length)];

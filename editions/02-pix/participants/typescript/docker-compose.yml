@@ -28,8 +28,6 @@ services:
       - POSTGRES_USER=rinha
       - POSTGRES_PASSWORD=rinha
       - POSTGRES_DB=rinha
-    ports:
-      - "${DB_PORT:-5432}:5432"
     volumes:
       - ${EDITION_PATH:-../..}/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     healthcheck:

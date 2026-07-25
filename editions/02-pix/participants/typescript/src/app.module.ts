@@ -10,11 +10,10 @@ import { TransferModule } from './Transfers/transfers.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'rinha',
-      password: 'rinha',
-      database: 'rinha',
+      // no container o banco é o serviço `db`; DATABASE_URL vem do compose
+      url:
+        process.env.DATABASE_URL ??
+        'postgres://rinha:rinha@localhost:5432/rinha',
       autoLoadEntities: true,
       synchronize: false,
     }),

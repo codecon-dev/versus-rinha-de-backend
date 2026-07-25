@@ -41,14 +41,13 @@ services:
       - "15672:15672"
     networks:
       - app-network
+
   db:
     image: postgres:18-alpine
     environment:
       - POSTGRES_USER=rinha
       - POSTGRES_PASSWORD=rinha
       - POSTGRES_DB=rinha
-    ports:
-      - "5432:5432"
     volumes:
       - ${EDITION_PATH:-../..}/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:

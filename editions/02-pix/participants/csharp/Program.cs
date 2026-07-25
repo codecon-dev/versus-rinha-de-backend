@@ -9,7 +9,9 @@ builder.Services.ConfigureHttpJsonOptions(options =>
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
-    serverOptions.Listen(IPAddress.Parse("localhost"), 3000);
+    // IPAddress.Any: dentro do container é preciso ouvir em 0.0.0.0,
+    // senão a porta publicada não alcança o processo.
+    serverOptions.Listen(IPAddress.Any, 3000);
 });
 
 builder.Services.AddSingleton(_ => Db.CreateDataSource());

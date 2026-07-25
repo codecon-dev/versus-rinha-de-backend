@@ -45,11 +45,7 @@ export function stopParticipant(p: Participant, quiet = false): void {
   }
 }
 
-export async function waitForHealth(
-  p: Participant,
-  timeoutMs = 30_000,
-  quiet = false
-): Promise<boolean> {
+export async function waitForHealth(p: Participant, timeoutMs = 30_000, quiet = false): Promise<boolean> {
   const url = `http://${APP_HOST}:${p.port}/health`;
   const start = Date.now();
 

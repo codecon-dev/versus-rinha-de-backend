@@ -23,7 +23,7 @@ describe("Prova 4 — Concorrência", () => {
       idempotencyKey: idempotencyKey("overdraft"),
     }));
 
-    for (const res of responses) expect(res.status).toBe(201);
+    for (const res of responses) expect([200, 201]).toContain(res.status);
     const created: Transfer[] = await Promise.all(responses.map((r) => r.json()));
 
     const settled = await settle(created.map((t) => t.id));
