@@ -164,7 +164,7 @@ post "/transfers" do |env|
     t.created_at = time
     t.status = "pending"
     t.failure_reason = nil
-    env.response.status_code = tt.xmax == 0 ? 200 : 201
+    env.response.status_code = tt.xmax ? 201 : 200
     env.json(tt)
   rescue e: PQ::PQError
     puts e.message.to_s
