@@ -29,25 +29,22 @@ class TransferController extends Controller
 
         for ($attempts = 0; $attempts < 5; $attempts++) {
             try {
-                $inserted = DB::select(
+                // DO UPDATE (no-op) força RETURNING mesmo em conflito, e faz a tx
+                // concorrente serializar corretamente: o perdedor bloqueia até o
+                // vencedor commitar, então sempre enxergamos a linha final.
+                // xmax = 0 diferencia INSERT novo (201) de conflito resolvido (200).
+                $row = DB::selectOne(
                     "INSERT INTO transfers (id, payer_id, payee_id, amount, idempotency_key, status)
                      VALUES (?, ?, ?, ?, ?, 'pending')
-                     ON CONFLICT (idempotency_key) DO NOTHING
-                     RETURNING id",
+                     ON CONFLICT (idempotency_key) DO UPDATE
+                         SET idempotency_key = EXCLUDED.idempotency_key
+                     RETURNING id, (xmax = 0) AS inserted",
                     [$id, $data['payerId'], $data['payeeId'], $data['amount'], $data['idempotencyKey']]
                 );
 
-                if ($inserted === []) {
-                    $existing = Transfer::where('idempotency_key', $data['idempotencyKey'])->first();
-                    if ($existing !== null) {
-                        return response()->json($existing->toApi(), 200);
-                    }
-                    continue;
-                }
+                $transfer = Transfer::find($row->id);
 
-                $transfer = Transfer::find($inserted[0]->id);
-
-                return response()->json($transfer->toApi(), 201);
+                return response()->json($transfer->toApi(), $row->inserted ? 201 : 200);
             } catch (QueryException $e) {
                 $code = $e->getCode();
 
