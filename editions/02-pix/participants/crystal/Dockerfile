@@ -1,4 +1,4 @@
-FROM crystallang/crystal:latest-alpine AS builder
+FROM crystallang/crystal:1.20.3 AS builder
 WORKDIR /app
 COPY shard.yml ./
 RUN shards install

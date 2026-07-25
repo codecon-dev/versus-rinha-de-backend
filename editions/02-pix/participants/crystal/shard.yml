@@ -6,6 +6,14 @@ targets:
     main: src/app.cr
 
 # Adicione suas dependências aqui (ex: pg, kemal, ...) e rode `shards install`.
-dependencies: {}
+dependencies:
+  kemal:
+    git: https://github.com/kemalcr/kemal.git
+    version: 1.12.0
+  amqp-client:
+    git: https://github.com/cloudamqp/amqp-client.cr.git
+    version: 1.3.1
+  pg:
+    github: will/crystal-pg
 
 crystal: ">= 1.0.0"
