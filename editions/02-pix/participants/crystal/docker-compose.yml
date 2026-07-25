@@ -9,7 +9,7 @@ services:
       - "${APP_PORT:-3005}:3000"
     environment:
       - PORT=3000
-      - DATABASE_URL=postgres://rinha:rinha@db:5432/rinha?sslmode=disable&max_pool_size=1
+      - DATABASE_URL=postgres://rinha:rinha@db:5432/rinha?sslmode=disable&max_pool_size=8&min_pool_size=8
       - BROKER_URL=amqp://guest:guest@lavinmq:5672/
     #command: ["tail", "-f", "/dev/null"]
     depends_on:
@@ -41,14 +41,6 @@ services:
       - "15672:15672"
     networks:
       - app-network
-  lavinmq:
-    image: redis
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      - app-network
-
   db:
     image: postgres:18-alpine
     environment:
