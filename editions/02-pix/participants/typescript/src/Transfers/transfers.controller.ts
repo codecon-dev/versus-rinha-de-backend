@@ -1,4 +1,8 @@
-import { Body, Controller, Get, HttpStatus, NotFoundException, Param, Post, Res } from '@nestjs/common';
+import {
+    Body,
+    Controller,
+    Get, HttpStatus, NotFoundException, Param, Post, Res
+} from '@nestjs/common';
 import type { Response } from 'express';
 import { TransferServices } from './transfers.service';
 import { TransferirValorDTO } from './DTO/TransferirValor.dto';

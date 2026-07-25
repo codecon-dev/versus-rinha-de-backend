@@ -1,8 +1,8 @@
 FROM node:24-alpine
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm install --omit=dev
+RUN npm install
 COPY . .
+RUN npm run build
 EXPOSE 3000
-# Node 24 roda .ts direto, sem passo de build. Ponto de entrada: src/server.ts
-CMD ["node", "./src/main.ts"]
+CMD ["node", "dist/main.js"]

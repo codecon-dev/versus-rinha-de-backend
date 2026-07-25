@@ -1,4 +1,9 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { TransferEntity } from '../Transfers/entity/transfers.entity';
 import { Accounts } from '../Accounts/entity/account.entity';
@@ -9,7 +14,9 @@ export class ValidaPixWorker implements OnModuleInit, OnModuleDestroy {
     private timer: NodeJS.Timeout | null = null;
     private running = false;
 
-    constructor(private readonly dataSource: DataSource) { }
+  constructor(
+    private readonly dataSource: DataSource
+  ) { }
 
     onModuleInit() {
         this.timer = setInterval(() => this.tick(), 200);
