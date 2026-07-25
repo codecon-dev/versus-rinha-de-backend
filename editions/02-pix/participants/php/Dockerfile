@@ -1,15 +1,24 @@
 FROM dunglas/frankenphp:1-php8.4-alpine
 
-# pdo_pgsql para o Postgres, pcntl para processos de longa duração
-RUN install-php-extensions pdo_pgsql opcache pcntl
+# extensoes: pdo_pgsql pro Postgres, opcache pra performance, pcntl pro worker
+RUN install-php-extensions pdo_pgsql opcache pcntl intl
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
+
+# instala deps primeiro pra cache do docker
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --no-interaction --prefer-dist --no-scripts --no-autoloader
+
 COPY . .
 
-# Instala as dependências se houver composer.json (Laravel, Slim, o que você usar)
-RUN if [ -f composer.json ]; then composer install --no-dev --no-interaction --prefer-dist; fi
+RUN composer dump-autoload --optimize --no-dev --no-scripts \
+ && mkdir -p storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs bootstrap/cache \
+ && chmod -R 777 storage bootstrap/cache
 
-# FrankenPHP serve /app/public
-ENV SERVER_NAME=":3000"
+ENV APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stderr \
+    SERVER_NAME=":3000"
+
 EXPOSE 3000
