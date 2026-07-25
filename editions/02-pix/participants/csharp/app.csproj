@@ -11,6 +11,7 @@
 
   <!-- Adicione suas dependências aqui (ex: Npgsql, Dapper, ...) -->
   <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
   </ItemGroup>
 
 </Project>
