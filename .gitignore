@@ -1,9 +1,11 @@
 node_modules/
 dist/
+bin/
+obj/
 .env
 *.log
-results/*.json
-results/*.html
+**/results/*.json
+**/results/*.html
 tmp/
 .DS_Store
 __pycache__/

@@ -1,12 +1,8 @@
-networks:
-  app-network:
-    driver: bridge
-
 services:
   api:
     build: .
     ports:
-      - "${APP_PORT:-3001}:3000"
+      - "${APP_PORT:-3000}:3000"
     environment:
       - PORT=3000
       - DATABASE_URL=postgres://rinha:rinha@db:5432/rinha?sslmode=disable
@@ -16,13 +12,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "1.5"
+          cpus: "5"
           memory: "3GB"
-    networks:
-      - app-network
 
   db:
-    image: postgres:18-alpine
+    image: postgres:16-alpine
     environment:
       - POSTGRES_USER=rinha
       - POSTGRES_PASSWORD=rinha
@@ -39,5 +33,3 @@ services:
         limits:
           cpus: "0.5"
           memory: "1GB"
-    networks:
-      - app-network

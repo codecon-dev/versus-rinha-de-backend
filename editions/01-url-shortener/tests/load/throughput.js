@@ -7,6 +7,8 @@ const BASE_URL = __ENV.BASE_URL || "http://host.docker.internal:3000";
 const OUTPUT_FILE = __ENV.OUTPUT_FILE || "throughput-results.json";
 
 export const options = {
+  // k6 v1 só emite p(90)/p(95) por padrão — o scorer precisa de p50/p95/p99
+  summaryTrendStats: ["avg", "min", "med", "max", "p(50)", "p(95)", "p(99)"],
   stages: [
     { duration: "10s", target: 50 },
     { duration: "30s", target: 200 },
