@@ -252,6 +252,10 @@ async function main() {
             `p95 ${load.latency.p95.toFixed(0)}ms  p99 ${load.latency.p99.toFixed(0)}ms`
         );
       }
+    } catch (e: any) {
+      // Uma falha transitória num participante não pode derrubar o
+      // pipeline inteiro e jogar fora o resultado dos outros.
+      console.log(`    ${C.red}erro na carga: ${e.message ?? e}${C.reset}`);
     } finally {
       stopParticipant(p, true);
     }

@@ -12,3 +12,5 @@ __pycache__/
 *.pyc
 vendor/
 /editions/02-pix/participants/csharp/.vs
+target/
+.idea/
