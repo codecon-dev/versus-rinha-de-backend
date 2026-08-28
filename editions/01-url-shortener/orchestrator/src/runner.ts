@@ -80,7 +80,7 @@ export function runLoadTests(p: Participant): LoadResult | null {
   let throughput: ThroughputResult | null = null;
   try {
     execSync(
-      `k6 run --out json=/dev/null -e BASE_URL=http://${APP_HOST}:${p.port} -e OUTPUT_FILE=${throughputOutput} throughput.js`,
+      `k6 run -e BASE_URL=http://${APP_HOST}:${p.port} -e OUTPUT_FILE=${throughputOutput} throughput.js`,
       {
         cwd: loadDir,
         encoding: "utf-8",
@@ -109,7 +109,7 @@ export function runLoadTests(p: Participant): LoadResult | null {
   let latency: LatencyResult | null = null;
   try {
     execSync(
-      `k6 run --out json=/dev/null -e BASE_URL=http://${APP_HOST}:${p.port} -e OUTPUT_FILE=${latencyOutput} latency.js`,
+      `k6 run -e BASE_URL=http://${APP_HOST}:${p.port} -e OUTPUT_FILE=${latencyOutput} latency.js`,
       {
         cwd: loadDir,
         encoding: "utf-8",

@@ -22,11 +22,14 @@ export function buildParticipant(p: Participant): void {
 
 export function startParticipant(p: Participant): void {
   console.log(`  Starting ${p.name} on port ${p.port}...`);
-  execSync(`APP_PORT=${p.port} docker compose -p rinha-${p.name} up -d`, {
+  execSync(`docker compose -p rinha-${p.name} up -d`, {
     ...execOpts,
     cwd: p.dir,
     stdio: "inherit",
     timeout: 60_000,
+    // Passed via env rather than a shell-prefixed `APP_PORT=... cmd`, which
+    // only cmd.exe/PowerShell can't parse (execSync uses cmd.exe on Windows).
+    env: { ...process.env, APP_PORT: String(p.port) },
   });
 }
 

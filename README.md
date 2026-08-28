@@ -1,3 +1,24 @@
+# Codecon Versus — Rinha de Backend (fork com participante Rust)
+
+Fork do [repositório original da Codecon](https://github.com/codecon-dev/versus-rinha-de-backend) com um participante em Rust adicionado nas duas edições. Ficou em 1º lugar nas duas:
+
+| Edição | Pontos | Corretude | Throughput | Latência |
+|---|---|---|---|---|
+| [01 — Encurtador de URL](editions/01-url-shortener/participants/rust) | 946/1000 | 449/500 | 297/300 | 200/200 |
+| [02 — Recriando o PIX](editions/02-pix/participants/rust) | 914/1000 | 500/500 | 278/300 | 136/200 |
+
+Os números brutos que o orquestrador gerou estão em [`docs/scores/`](docs/scores), e o relato completo — incluindo um deadlock real que apareceu sob carga e três bugs do orquestrador que só davam as caras rodando fora do devcontainer — está em [`docs/blog-post.md`](docs/blog-post.md).
+
+Pra rodar você mesmo (precisa de Docker e, pro pipeline completo, de [k6](https://k6.io)):
+
+```bash
+cd editions/02-pix                # ou editions/01-url-shortener
+./scripts/test-local.sh rust      # só a corretude do participante Rust
+./scripts/rounds.sh               # pipeline completo, ranking no final
+```
+
+---
+
 # Codecon Versus — Rinha de Backend
 
 Repositório das edições da Rinha de Backend do canal da Codecon. Em cada edição, devs de linguagens diferentes implementam **a mesma API**, sem IA, dentro do mesmo prazo. No final um orquestrador automatizado roda testes de corretude e de carga e cospe o ranking.
@@ -6,8 +27,8 @@ Repositório das edições da Rinha de Backend do canal da Codecon. Em cada edi�
 
 | # | Tema | Linguagens | Pasta |
 |---|------|-----------|-------|
-| 01 | Encurtador de URL | Go, Node.js, Python, Ruby | [`editions/01-url-shortener`](editions/01-url-shortener) |
-| 02 | Recriando o PIX | Crystal, C#, PHP, TypeScript (trocável) | [`editions/02-pix`](editions/02-pix) |
+| 01 | Encurtador de URL | Go, Node.js, Python, Ruby, **Rust** | [`editions/01-url-shortener`](editions/01-url-shortener) |
+| 02 | Recriando o PIX | Crystal, C#, PHP, TypeScript, **Rust** (trocável) | [`editions/02-pix`](editions/02-pix) |
 
 Cada edição é autocontida: spec (`README.md`), schema (`init.sql`), pastas dos participantes (`participants/`), testes (`tests/`), orquestrador (`orchestrator/`) e scripts (`scripts/`).
 
